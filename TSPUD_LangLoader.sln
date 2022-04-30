@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSPUD_LangLoader", "TSPUD_LangLoader\TSPUD_LangLoader.csproj", "{BADF86A9-9631-461E-8CC0-81B89C70C51B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BADF86A9-9631-461E-8CC0-81B89C70C51B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BADF86A9-9631-461E-8CC0-81B89C70C51B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BADF86A9-9631-461E-8CC0-81B89C70C51B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BADF86A9-9631-461E-8CC0-81B89C70C51B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5B32056C-0A20-405A-B326-7B74CF2ACFAE}
+	EndGlobalSection
+EndGlobal
