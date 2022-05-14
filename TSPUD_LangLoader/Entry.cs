@@ -90,5 +90,37 @@ namespace TSPUD_LangLoader
                 }
             }
         }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(SequelTools), "DoStandardSequelReplacementStep")]
+        public static bool DoStandardSequelReplacementStepPrefix(string originalText, IntConfigurable sequelCountConfigurable,
+                            IntConfigurable prefixIndexConfigurable, IntConfigurable postfixIndexConfigurable, ref string __result)
+        {
+            int intValue = prefixIndexConfigurable.GetIntValue();
+            string newValue = "";
+            if (intValue != -1)
+            {
+                newValue = SequelTools.PrefixLocalizedText(intValue);
+            }
+            int intValue2 = postfixIndexConfigurable.GetIntValue();
+            string newValue2 = "";
+            if (intValue2 != -1)
+            {
+                newValue2 = SequelTools.PostfixLocalizedText(intValue2);
+            }
+
+            if (newValue.Contains("…"))
+            {
+                MelonLogger.Msg("replace placeholder");
+                newValue = newValue.Replace("…", newValue2);
+                newValue2 = "";
+            }
+
+            __result = originalText.Replace("\\n", "\n").Replace("%!N!%", sequelCountConfigurable.
+                GetIntValue().ToString()).Replace("%!P!%", newValue).Replace(" %!S!%", newValue2);
+
+            MelonLogger.Msg("final result {0}", __result);
+            return false;
+        }
     }
 }
