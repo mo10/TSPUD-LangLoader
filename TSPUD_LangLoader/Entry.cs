@@ -74,18 +74,19 @@ namespace TSPUD_LangLoader
 
         public override void OnUpdate()
         {
-            if (MainCamera.Camera == null)
+            if (StanleyController.Instance == null)
                 return;
 
             if (Input.GetKeyDown(KeyCode.Z))
             {
+                StanleyController.Instance.FieldOfView = 10;
                 MainCamera.Camera.fieldOfView = (MainCamera.Camera.fieldOfView / 2);
-                MelonLogger.Msg("keydown");
+                MelonLogger.Msg("Zoom in");
             }
             if (Input.GetKeyUp(KeyCode.Z))
             {
-                MainCamera.Camera.fieldOfView = (MainCamera.Camera.fieldOfView * 2);
-                MelonLogger.Msg("keyup");
+                StanleyController.Instance.FieldOfView = StanleyController.Instance.FieldOfViewBase;
+                MelonLogger.Msg("Zoom out");
             }
         }
     }
