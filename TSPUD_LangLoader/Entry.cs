@@ -20,36 +20,81 @@ namespace TSPUD_LangLoader
         {
             Application.runInBackground = true;
 
-            TextureManager.Init();
-            HarmonyInstance.PatchAll();
+            AssetManager.Init();
+            SetFallbackFont();
 
-            SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+            HarmonyInstance.PatchAll();
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+        private void SetFallbackFont()
+        {
+            try
+            {
+                Font font = AssetManager.Get<Font>("SourceHanSans");
+                TMP_FontAsset fontAsset = TMP_FontAsset.CreateFontAsset(font);
+                if (fontAsset)
+                {
+                    fontAsset.name = $"Patched {font.name}";
+                    TMP_Settings.fallbackFontAssets.Add(fontAsset);
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"Unable to load font", ex);
+            }
         }
 
-        private void SceneManager_sceneLoaded(Scene scene, LoadSceneMode mode)
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            var texs = Resources.FindObjectsOfTypeAll<Texture2D>();
+            var textures = Resources.FindObjectsOfTypeAll<Texture2D>();
 #if DEBUG
-            MelonLogger.Msg($"Scene loaded: {scene.name} {texs.Length}");
+            MelonLogger.Msg($"Scene loaded: {scene.name}");
 #endif
-            foreach (var tex in texs)
+            using (_ = new Diagnosis("ScenePatch"))
+                foreach (var texture in textures)
+                {
+                    try
+                    {
+                        var new_texture = AssetManager.Get<Texture2D>(texture.name);
+                        if (new_texture == null)
+                            continue;
+
+                        texture.UpdateExternalTexture(new_texture.GetNativeTexturePtr());
+                        texture.name = $"Patched {texture.name}";
+#if DEBUG
+                        MelonLogger.Msg($"Patched texture: {texture.name}");
+#endif
+                    }
+                    catch (Exception ex)
+                    {
+                        MelonLogger.Error($"Failed to patch texture: {texture.name}", ex);
+                    }
+                }
+        }
+
+        public override void OnUpdate()
+        {
+            if (MainCamera.Camera == null)
+                return;
+
+            if (Input.GetKeyDown(KeyCode.Z))
             {
-                TextureManager.PatchTexture(tex);
+                MainCamera.Camera.fieldOfView = (MainCamera.Camera.fieldOfView / 2);
+                MelonLogger.Msg("keydown");
+            }
+            if (Input.GetKeyUp(KeyCode.Z))
+            {
+                MainCamera.Camera.fieldOfView = (MainCamera.Camera.fieldOfView * 2);
+                MelonLogger.Msg("keyup");
             }
         }
     }
+
 
     [HarmonyPatch]
     static class LanguagePatch
     {
         private static bool IsLoaded = false;
-
-        static LanguagePatch()
-        {
-            // Setup TMP fallback fonts
-            FontManager.Init();
-            TMP_Settings.fallbackFontAssets.AddRange(FontManager.Fonts.Values.ToList());
-        }
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(LocalizationManager), "RegisterSourceInResources")]
@@ -65,27 +110,19 @@ namespace TSPUD_LangLoader
                     IsLoaded = true;
 
                     // Add custom fonts to game asset manager
-                    foreach (var fontAsset in FontManager.Fonts)
-                    {
-                        asset.mSource.AddAsset(fontAsset.Value);
-                    }
-
+                    asset.mSource.AddAsset(AssetManager.Get<Font>("SourceHanSans"));
+                    // Import translate
                     string filename = Path.Combine(MelonUtils.UserDataDirectory, $"translate.csv");
-
-                    if (File.Exists(filename))
+                    string text = AssetManager.GetText("translate");
+                    if (string.IsNullOrEmpty(text))
                     {
-#if DEBUG
-                        MelonLogger.Msg($"Translate loaded: {filename}");
-#endif
-                        var raw_csv = File.ReadAllText(filename);
-                        asset.mSource.Import_CSV("", raw_csv, eSpreadsheetUpdateMode.Merge);
+                        MelonLogger.Msg($"Translate exported: {filename}");
+                        File.WriteAllText(filename, asset.mSource.Export_CSV("", specializationsAsRows: false));
                     }
                     else
                     {
-#if DEBUG
-                        MelonLogger.Msg($"Translate exported: {filename}");
-#endif
-                        File.WriteAllText(filename, asset.mSource.Export_CSV("", specializationsAsRows: false));
+                        asset.mSource.Import_CSV("", text, eSpreadsheetUpdateMode.Merge);
+                        MelonLogger.Msg($"Translate loaded");
                     }
                 }
             }
@@ -111,15 +148,18 @@ namespace TSPUD_LangLoader
 
             if (newValue.Contains("…"))
             {
+#if DEBUG
                 MelonLogger.Msg("replace placeholder");
+#endif
                 newValue = newValue.Replace("…", newValue2);
                 newValue2 = "";
             }
 
             __result = originalText.Replace("\\n", "\n").Replace("%!N!%", sequelCountConfigurable.
                 GetIntValue().ToString()).Replace("%!P!%", newValue).Replace(" %!S!%", newValue2);
-
+#if DEBUG
             MelonLogger.Msg("final result {0}", __result);
+#endif
             return false;
         }
     }

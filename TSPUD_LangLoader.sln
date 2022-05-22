@@ -7,10 +7,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSPUD_LangLoader", "TSPUD_L
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		BundleDebug|Any CPU = BundleDebug|Any CPU
+		BundleRelease|Any CPU = BundleRelease|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BADF86A9-9631-461E-8CC0-81B89C70C51B}.BundleDebug|Any CPU.ActiveCfg = BundleDebug|Any CPU
+		{BADF86A9-9631-461E-8CC0-81B89C70C51B}.BundleDebug|Any CPU.Build.0 = BundleDebug|Any CPU
+		{BADF86A9-9631-461E-8CC0-81B89C70C51B}.BundleRelease|Any CPU.ActiveCfg = BundleRelease|Any CPU
+		{BADF86A9-9631-461E-8CC0-81B89C70C51B}.BundleRelease|Any CPU.Build.0 = BundleRelease|Any CPU
 		{BADF86A9-9631-461E-8CC0-81B89C70C51B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BADF86A9-9631-461E-8CC0-81B89C70C51B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BADF86A9-9631-461E-8CC0-81B89C70C51B}.Release|Any CPU.ActiveCfg = Release|Any CPU
