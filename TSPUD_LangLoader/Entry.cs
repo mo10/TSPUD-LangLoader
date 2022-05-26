@@ -164,4 +164,28 @@ namespace TSPUD_LangLoader
             return false;
         }
     }
+
+
+    [HarmonyPatch]
+    static class BuildNumberPatch
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(SetBuildNumberText), "UpdateText")]
+        public static void UpdateTextPostfix(ref TMP_Text ___text)
+        {
+            ___text.text = $"<size=200%>起源汉化组</size>\n" +
+#if BUNDLE
+                "打包" +
+#else
+                "散装" +
+#endif
+
+#if DEBUG
+                $"测试版\n" +
+#else
+                $"发布版\n" +
+#endif
+                (Application.version ?? "未知版本");
+        }
+    }
 }
