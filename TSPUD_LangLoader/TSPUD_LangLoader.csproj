@@ -61,6 +61,10 @@
       <HintPath>..\..\..\The Stanley Parable Ultra Deluxe_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="com.rlabrecque.steamworks.net">
+      <HintPath>..\..\..\The Stanley Parable Ultra Deluxe_Data\Managed\com.rlabrecque.steamworks.net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="MelonLoader">
       <HintPath>..\..\..\MelonLoader\MelonLoader.dll</HintPath>
       <Private>False</Private>
@@ -109,11 +113,14 @@
       <HintPath>..\..\..\The Stanley Parable Ultra Deluxe_Data\Managed\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>..\..\..\The Stanley Parable Ultra Deluxe_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssetManager.cs" />
     <Compile Include="Entry.cs" />
-    <Compile Include="MeshLoader.cs" />
     <Compile Include="OBJImport\CharWordReader.cs" />
     <Compile Include="OBJImport\MTLLoader.cs" />
     <Compile Include="OBJImport\OBJLoader.cs" />
@@ -130,6 +137,7 @@
     <Compile Include="OBJImport\TextureLoader\ImageLoaderHelper.cs" />
     <Compile Include="OBJImport\TextureLoader\ImageUtils.cs" />
     <Compile Include="OBJImport\TextureLoader\TGALoader.cs" />
+    <Compile Include="SourceTeamOverlay.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Diagnosis.cs" />
     <Compile Include="Utils.cs" />

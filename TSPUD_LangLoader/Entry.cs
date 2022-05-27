@@ -25,7 +25,9 @@ namespace TSPUD_LangLoader
 
             HarmonyInstance.PatchAll();
             SceneManager.sceneLoaded += OnSceneLoaded;
+
         }
+
         private void SetFallbackFont()
         {
             try
@@ -46,9 +48,9 @@ namespace TSPUD_LangLoader
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            
             var textures = Resources.FindObjectsOfTypeAll<Texture2D>();
             var meshes = Resources.FindObjectsOfTypeAll<Mesh>();
+            SourceTeamOverlay.Instance.setup();
 #if DEBUG
             MelonLogger.Msg($"Scene loaded: {scene.name}");
 #endif
@@ -83,9 +85,6 @@ namespace TSPUD_LangLoader
                         if (new_mesh == null || mesh == null)
                             continue;
 
-                        var aaaa = UnityEngine.Object.Instantiate(AssetManager.Get<GameObject>("pb_Mesh-4311586")).GetComponent<MeshFilter>();
-                        var new_mesh2 = UnityEngine.Object.Instantiate(new_mesh);
-
                         string name = $"Patched {mesh.name}";
                         mesh.Clear();
                         new_mesh.CopyTo(mesh);
@@ -94,7 +93,7 @@ namespace TSPUD_LangLoader
                         MelonLogger.Msg($"Patched mesh: {name}");
                     }catch(Exception ex)
                     {
-                        MelonLogger.Msg($"err {mesh.name}");
+                        MelonLogger.Error($" {mesh.name}", ex);
                     }
                 }
         }
@@ -115,10 +114,6 @@ namespace TSPUD_LangLoader
                 StanleyController.Instance.FieldOfView = StanleyController.Instance.FieldOfViewBase;
                 MelonLogger.Msg("Zoom out");
             }
-        }
-        public override void OnGUI()
-        {
-
         }
     }
 
