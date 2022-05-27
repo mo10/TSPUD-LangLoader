@@ -113,6 +113,23 @@
   <ItemGroup>
     <Compile Include="AssetManager.cs" />
     <Compile Include="Entry.cs" />
+    <Compile Include="MeshLoader.cs" />
+    <Compile Include="OBJImport\CharWordReader.cs" />
+    <Compile Include="OBJImport\MTLLoader.cs" />
+    <Compile Include="OBJImport\OBJLoader.cs" />
+    <Compile Include="OBJImport\OBJLoaderHelper.cs" />
+    <Compile Include="OBJImport\OBJObjectBuilder.cs" />
+    <None Include="OBJImport\Samples\ObjFromFile.cs" />
+    <None Include="OBJImport\Samples\ObjFromStream.cs" />
+    <Compile Include="OBJImport\StringExtensions.cs" />
+    <Compile Include="OBJImport\TextureLoader\BinaryExtensions.cs" />
+    <Compile Include="OBJImport\TextureLoader\BMPLoader.cs" />
+    <Compile Include="OBJImport\TextureLoader\ColorExtensions.cs" />
+    <Compile Include="OBJImport\TextureLoader\DDSLoader.cs" />
+    <Compile Include="OBJImport\TextureLoader\ImageLoader.cs" />
+    <Compile Include="OBJImport\TextureLoader\ImageLoaderHelper.cs" />
+    <Compile Include="OBJImport\TextureLoader\ImageUtils.cs" />
+    <Compile Include="OBJImport\TextureLoader\TGALoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Diagnosis.cs" />
     <Compile Include="Utils.cs" />
@@ -121,6 +138,13 @@
     <EmbeddedResource Include="C:\Users\mo10\Documents\GitHub\Font\Assets\AssetBundles\sourceteam">
       <Link>resources\sourceteam</Link>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OBJImport\Samples\ObjFromFile.unity" />
+    <None Include="OBJImport\Samples\ObjFromStream.unity" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OBJImport\README.HTML" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
