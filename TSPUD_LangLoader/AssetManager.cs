@@ -1,4 +1,5 @@
-﻿using MelonLoader;
+﻿using Dummiesman;
+using MelonLoader;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,6 +22,8 @@ namespace TSPUD_LangLoader
 #else
         private static string baseFontPath = Path.Combine(MelonUtils.UserDataDirectory, $"fonts");
         private static string baseTexturePath = Path.Combine(MelonUtils.UserDataDirectory, $"textures");
+        private static string baseMeshPath = Path.Combine(MelonUtils.UserDataDirectory, $"meshes");
+
         private static string baseTextFile = Path.Combine(MelonUtils.UserDataDirectory, $"translate.csv");
 
         private static Dictionary<string, string> allAssets = new Dictionary<string, string>();
@@ -47,18 +50,20 @@ namespace TSPUD_LangLoader
                 return;
             }
 
-            using (_ = new Diagnosis("AssetBundle.LoadAllAssets"))
-                foreach (var asset in assetBundle.LoadAllAssets())
-                {
-                    allAssets.Add(asset.name, asset);
-#if DEBUG
-                    MelonLogger.Msg($"Loaded asset: {asset.name}");
-#endif
-                }
+//            using (_ = new Diagnosis("AssetBundle.LoadAllAssets"))
+//                foreach (var asset in assetBundle.LoadAllAssets())
+//                {
+//                    allAssets.Add(asset.name, asset);
+//#if DEBUG
+//                    MelonLogger.Msg($"Loaded asset: {asset.name}");
+//#endif
+//                }
 #else
             var mapping1 = GetFileMapping(baseFontPath,"*.ttf");
             var mapping2 = GetFileMapping(baseTexturePath, "*.png");
-            allAssets = allAssets.Concat(mapping1).Concat(mapping2).ToDictionary(x => x.Key, x => x.Value);
+            var mapping3 = GetFileMapping(baseMeshPath, "*.obj");
+
+            allAssets = allAssets.Concat(mapping1).Concat(mapping2).Concat(mapping3).ToDictionary(x => x.Key, x => x.Value);
 
             if (File.Exists(baseTextFile))
             {
@@ -71,12 +76,16 @@ namespace TSPUD_LangLoader
 
         public static T Get<T>(string name) where T : UnityEngine.Object
         {
-            if (!allAssets.ContainsKey(name))
+
+            if (string.IsNullOrEmpty(name.Trim()))
                 return default(T);
 #if BUNDLE
-            return (T)allAssets[name];
+            return assetBundle.LoadAsset<T>(name);
+            //return (T)allAssets[name];
 #else
-            UnityEngine.Object obj = null;
+            if (!allAssets.ContainsKey(name))
+                return default(T);
+            UnityEngine.Object obj = default(T);
             if (assetCaches.ContainsKey(name))
             {
                 obj = assetCaches[name];
@@ -104,6 +113,16 @@ namespace TSPUD_LangLoader
 
                     obj = font;
                 }
+                else if (typeof(T) == typeof(Mesh))
+                {
+                    using (var stream = File.OpenRead(allAssets[name]))
+                    {
+                        var loadedObj = new OBJLoader().Load(stream);
+                        var meshfilter = loadedObj.GetComponentInChildren<MeshFilter>(true);
+
+                        obj = meshfilter?.mesh;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -118,10 +137,10 @@ namespace TSPUD_LangLoader
 
         public static string GetText(string name)
         {
-            if (!allAssets.ContainsKey(name))
-                return null;
+            //if (!allAssets.ContainsKey(name))
+            //    return null;
 #if BUNDLE
-            return ((TextAsset)allAssets[name]).text;
+            return assetBundle.LoadAsset<TextAsset>(name).text;
 #else
             return File.ReadAllText(allAssets[name]);
 #endif

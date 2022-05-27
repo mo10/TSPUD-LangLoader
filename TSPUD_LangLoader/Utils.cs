@@ -1,15 +1,29 @@
-﻿using System;
+﻿using MelonLoader;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace TSPUD_LangLoader
 {
     public static class Utils
     {
+        public static void CopyTo<T>(this T src_mesh, T dst_mesh)
+        {
+            foreach (var property in typeof(T).GetProperties())
+            {
+                if (property.GetSetMethod() != null && property.GetGetMethod() != null)
+                {
+                    MelonLogger.Msg($"  {property.Name}");
+                    property.SetValue(dst_mesh, property.GetValue(src_mesh, null), null);
+                }
+            }
+        }
+
         /// <summary>
         /// Read embedded Resource from this assembly.
         /// </summary>

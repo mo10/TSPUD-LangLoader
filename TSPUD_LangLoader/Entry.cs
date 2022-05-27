@@ -46,11 +46,13 @@ namespace TSPUD_LangLoader
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            
             var textures = Resources.FindObjectsOfTypeAll<Texture2D>();
+            var meshes = Resources.FindObjectsOfTypeAll<Mesh>();
 #if DEBUG
             MelonLogger.Msg($"Scene loaded: {scene.name}");
 #endif
-            using (_ = new Diagnosis("ScenePatch"))
+            using (_ = new Diagnosis("TexturePatch"))
                 foreach (var texture in textures)
                 {
                     try
@@ -68,6 +70,31 @@ namespace TSPUD_LangLoader
                     catch (Exception ex)
                     {
                         MelonLogger.Error($"Failed to patch texture: {texture.name}", ex);
+                    }
+                }
+
+            using(_=new Diagnosis("MeshPath"))
+                foreach(var mesh in meshes)
+                {
+                    try
+                    {
+
+                        var new_mesh = AssetManager.Get<Mesh>(mesh.name);
+                        if (new_mesh == null || mesh == null)
+                            continue;
+
+                        var aaaa = UnityEngine.Object.Instantiate(AssetManager.Get<GameObject>("pb_Mesh-4311586")).GetComponent<MeshFilter>();
+                        var new_mesh2 = UnityEngine.Object.Instantiate(new_mesh);
+
+                        string name = $"Patched {mesh.name}";
+                        mesh.Clear();
+                        new_mesh.CopyTo(mesh);
+                        mesh.name = name;
+
+                        MelonLogger.Msg($"Patched mesh: {name}");
+                    }catch(Exception ex)
+                    {
+                        MelonLogger.Msg($"err {mesh.name}");
                     }
                 }
         }
@@ -88,6 +115,10 @@ namespace TSPUD_LangLoader
                 StanleyController.Instance.FieldOfView = StanleyController.Instance.FieldOfViewBase;
                 MelonLogger.Msg("Zoom out");
             }
+        }
+        public override void OnGUI()
+        {
+
         }
     }
 
