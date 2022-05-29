@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSPUD_LangLoader", "TSPUD_LangLoader\TSPUD_LangLoader.csproj", "{BADF86A9-9631-461E-8CC0-81B89C70C51B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entrypoint", "Entrypoint\Entrypoint.csproj", "{B6B63799-E9EF-43B3-A91F-3525D18041E6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		BundleDebug|Any CPU = BundleDebug|Any CPU
@@ -21,6 +23,14 @@ Global
 		{BADF86A9-9631-461E-8CC0-81B89C70C51B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BADF86A9-9631-461E-8CC0-81B89C70C51B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BADF86A9-9631-461E-8CC0-81B89C70C51B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6B63799-E9EF-43B3-A91F-3525D18041E6}.BundleDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6B63799-E9EF-43B3-A91F-3525D18041E6}.BundleDebug|Any CPU.Build.0 = Debug|Any CPU
+		{B6B63799-E9EF-43B3-A91F-3525D18041E6}.BundleRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{B6B63799-E9EF-43B3-A91F-3525D18041E6}.BundleRelease|Any CPU.Build.0 = Release|Any CPU
+		{B6B63799-E9EF-43B3-A91F-3525D18041E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6B63799-E9EF-43B3-A91F-3525D18041E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6B63799-E9EF-43B3-A91F-3525D18041E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6B63799-E9EF-43B3-A91F-3525D18041E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
