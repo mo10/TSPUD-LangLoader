@@ -19,6 +19,9 @@ namespace Entrypoint
         public Text textBC;
         public Text textBR;
         private bool isSteamInited = false;
+        float zoom_step = 5f;
+        float zoom_stop = 0f;
+        bool zoom_down = false;
 
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoInlining)]
         void Awake()
@@ -49,6 +52,37 @@ namespace Entrypoint
                 textBC.text = SteamUser.GetSteamID().ToString();
                 Logger.Debug("Update");
             }
+            if (StanleyController.Instance == null)
+                return;
+
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                zoom_down = true;
+                zoom_stop = StanleyController.Instance.FieldOfViewBase / 2;
+                //StanleyController.Instance.FieldOfView = 10;
+
+                //MainCamera.Camera.fieldOfView = (MainCamera.Camera.fieldOfView / 2);
+                //Logger.Debug("Zoom in");
+            }
+            if (Input.GetKeyUp(KeyCode.Z))
+            {
+                zoom_down = false;
+                zoom_stop = StanleyController.Instance.FieldOfViewBase;
+                //Logger.Debug("Zoom out");
+            }
+            if(zoom_down && StanleyController.Instance.FieldOfView >= zoom_stop)
+            {
+                StanleyController.Instance.FieldOfView -= zoom_step;
+            }
+            else if (!zoom_down && StanleyController.Instance.FieldOfView < zoom_stop)
+            {
+                StanleyController.Instance.FieldOfView += zoom_step;
+            }
+            //else if (zoom_stop !=0 && StanleyController.Instance.FieldOfView != zoom_stop)
+            //{
+            //    StanleyController.Instance.FieldOfView = zoom_stop;
+            //    zoom_stop = 0;
+            //}
         }
 
         Text CreateText(Vector2 pivot, Vector2 anchorMin, Vector2 anchorMax, TextAnchor textAnchor)
