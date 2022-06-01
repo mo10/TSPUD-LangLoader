@@ -13,10 +13,10 @@ namespace Entrypoint
     class SourceTeamOverlay : MonoBehaviour
     {
         public Text textTL;
-        public Text textTC;
+        //public Text textTC;
         public Text textTR;
         public Text textBL;
-        public Text textBC;
+        //public Text textBC;
         public Text textBR;
         private bool isSteamInited = false;
         float zoom_step = 5f;
@@ -34,11 +34,11 @@ namespace Entrypoint
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
             textTL = CreateText(new Vector2(0, 1), new Vector2(0, 1), new Vector2(0, 1), TextAnchor.UpperLeft);
-            textTC = CreateText(new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0.5f, 1), TextAnchor.UpperCenter);
+            //textTC = CreateText(new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0.5f, 1), TextAnchor.UpperCenter);
             textTR = CreateText(new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1), TextAnchor.UpperRight);
 
             textBL = CreateText(new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), TextAnchor.LowerLeft);
-            textBC = CreateText(new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(0.5f, 0), TextAnchor.LowerCenter);
+            //textBC = CreateText(new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(0.5f, 0), TextAnchor.LowerCenter);
             textBR = CreateText(new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0), TextAnchor.LowerRight);
 
             Logger.Debug("Awake");
@@ -49,7 +49,7 @@ namespace Entrypoint
             if (SteamManager.Initialized && !isSteamInited)
             {
                 isSteamInited = true;
-                textBC.text = SteamUser.GetSteamID().ToString();
+                textBL.text = SteamUser.GetSteamID().ToString();
                 Logger.Debug("Update");
             }
             if (StanleyController.Instance == null)
@@ -94,7 +94,7 @@ namespace Entrypoint
             var text = textGameObject.AddComponent<Text>();
             text.font = AssetManager.Get<Font>("SourceHanSans");
             text.color = new Color(1, 1, 1, 0.2f);
-            text.text = $"起源汉化组内部测试";
+            text.text = $"起源汉化组 测试版本";
             text.fontSize = 30;
             text.alignment = textAnchor;
 

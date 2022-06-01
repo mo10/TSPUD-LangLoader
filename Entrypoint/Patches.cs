@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using I2.Loc;
 using System;
+using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,7 +14,7 @@ namespace Entrypoint
         {
             AssetManager.Init();
 
-            var harmony = new Harmony("com.sourceteam.tspud.loader");
+            var harmony = new Harmony("com.sourcelocalizationteam.tspud");
             harmony.PatchAll();
         }
     }
@@ -45,6 +46,18 @@ namespace Entrypoint
             Logger.Debug("Set overlay");
             InitOverlay(__instance.gameObject);
 
+        }
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(GameMaster), "StartMovie")]
+        public static void StartMovie(bool skip, MoviePlayer player, string cameraName, ref string moviePath, bool isFullscreenMovie)
+        {
+            var filename = Path.GetFileName(moviePath);
+            var new_path = Path.Combine(Entrypoint.GameRootDirectory, "SourceLocalization", filename);
+            if (File.Exists(new_path))
+            {
+                moviePath = new_path;
+                Logger.Info($"Redirect video:{filename}");
+            }
         }
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
@@ -87,18 +100,18 @@ namespace Entrypoint
                         new_mesh.CopyTo(mesh);
                         mesh.name = name;
 
-                        Logger.Info($"Patched mesh: {name}");
+                        Logger.Info($"Patched mesh: {name}, vertices:{mesh.vertices.Length} triangles:{mesh.triangles.Length}");
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($" {mesh.name}", ex);
+                        Logger.Error($"Failed to patch mesh: {mesh.name}", ex);
                     }
                 }
         }
 
         private static void InitOverlay(GameObject gameObject)
         {
-            var gameMenu = new GameObject("SourceTeam");
+            var gameMenu = new GameObject("SourceLocalizationTeam");
             gameMenu.transform.parent = gameObject.transform;
             gameMenu.AddComponent<SourceTeamOverlay>();
         }

@@ -27,7 +27,7 @@ namespace Entrypoint
 
             using (_ = new Diagnosis("AssetBundle.LoadFromStream"))
             {
-                assetStream = Utils.GetResource("Resources/sourceteam");
+                assetStream = Utils.GetResource("Resources/sourcelocalizationteam");
                 assetBundle = AssetBundle.LoadFromStream(assetStream);
             }
             if (assetBundle == null)

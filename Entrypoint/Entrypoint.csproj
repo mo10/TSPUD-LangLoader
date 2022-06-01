@@ -40,7 +40,7 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DoorStopBundleRelease|AnyCPU'">
-    <OutputPath>bin\DoorStopBundleRelease\</OutputPath>
+    <OutputPath>..\..\..\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -122,8 +122,8 @@
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="C:\Users\mo10\Documents\GitHub\Font\Assets\AssetBundles\sourceteam">
-      <Link>Resources\sourceteam</Link>
+    <EmbeddedResource Include="C:\Users\mo10\Documents\GitHub\Font\Assets\AssetBundles\sourcelocalizationteam">
+      <Link>Resources\sourcelocalizationteam</Link>
     </EmbeddedResource>
     <None Include="packages.config" />
   </ItemGroup>
