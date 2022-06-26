@@ -6,17 +6,17 @@ namespace Entrypoint
 {
     class Logger
     {
+
+#if DEBUG
         private static StreamWriter fs = File.CreateText("sourceteam.log");
         private static object locker = new object();
 
         public static void Debug(object obj)
         {
-#if DEBUG
             var frame = new StackTrace().GetFrame(1);
             var className = frame.GetMethod().ReflectedType.Name;
             var methodName = frame.GetMethod().Name;
             AddLog("DEBUG", className, methodName, obj);
-#endif
         }
         public static void Error(object obj, Exception ex = null)
         {
@@ -32,6 +32,7 @@ namespace Entrypoint
             var methodName = frame.GetMethod().Name;
             AddLog("Info", className, methodName, obj);
         }
+
         public static void AddLog(string level, string className, string methodName, object obj)
         {
             var text = $"[{level}][{className}.{methodName}]: {obj}";
@@ -42,5 +43,10 @@ namespace Entrypoint
                 fs.Flush();
             }
         }
+#else
+        public static void Debug(object obj) { }
+        public static void Error(object obj, Exception ex = null) { }
+        public static void Info(object obj) { }
+#endif
     }
 }

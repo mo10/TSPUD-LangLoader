@@ -83,6 +83,15 @@ namespace Entrypoint
             //    StanleyController.Instance.FieldOfView = zoom_stop;
             //    zoom_stop = 0;
             //}
+
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                StanleyController.Instance.SetMovementSpeedMultiplier(3.0f);
+            }
+            if (Input.GetKeyUp(KeyCode.LeftShift))
+            {
+                StanleyController.Instance.SetMovementSpeedMultiplier(1.0f);
+            }
         }
 
         Text CreateText(Vector2 pivot, Vector2 anchorMin, Vector2 anchorMax, TextAnchor textAnchor)
