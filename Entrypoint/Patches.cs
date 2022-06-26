@@ -12,6 +12,7 @@ namespace Entrypoint
     {
         public static void DoPathcing()
         {
+            Logger.Debug("TSPUD-LangLoader started.");
             AssetManager.Init();
 
             var harmony = new Harmony("com.sourcelocalizationteam.tspud");
@@ -43,8 +44,9 @@ namespace Entrypoint
             }
 
             SceneManager.sceneLoaded += OnSceneLoaded;
-            Logger.Debug("Set overlay");
-            InitOverlay(__instance.gameObject);
+            //Logger.Debug("Set overlay");
+            //InitOverlay(__instance.gameObject);
+            HardcodedTextPatch.DoPatch(__instance.gameObject);
 
         }
         [HarmonyPrefix]
@@ -62,7 +64,6 @@ namespace Entrypoint
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             var textures = Resources.FindObjectsOfTypeAll<Texture2D>();
-            var meshes = Resources.FindObjectsOfTypeAll<Mesh>();
 
             Logger.Debug($"Scene loaded: {scene.name}");
 
@@ -75,6 +76,9 @@ namespace Entrypoint
                         if (new_texture == null)
                             continue;
 
+                        if (texture.name == "cardboardbox" && scene.name != "Firewatch_UD_MASTER")
+                            continue;
+
                         texture.UpdateExternalTexture(new_texture.GetNativeTexturePtr());
                         texture.name = $"Patched {texture.name}";
                         Logger.Debug($"Patched texture: {texture.name}");
@@ -85,26 +89,39 @@ namespace Entrypoint
                     }
                 }
 
+            //var cubemaps = Resources.FindObjectsOfTypeAll<Cubemap>();
+            //using (_ = new Diagnosis("CubemapPatch"))
+            //{
+            //    foreach(var cubemap in cubemaps)
+            //    {
+            //        var new_cubemap = AssetManager.Get<Cubemap>(cubemap.name);
+            //        if (new_cubemap == null)
+            //            continue;
+            //        cubemap.UpdateExternalTexture(new_cubemap.GetNativeTexturePtr());
+            //        cubemap.name = $"Patched {cubemap.name}";
+            //        Logger.Debug($"Patched cubemap: {cubemap.name}");
+            //    }
+            //}
+
+                var meshFilters = Resources.FindObjectsOfTypeAll<MeshFilter>();
+            Logger.Debug($"Patch MeshFilters, count: {meshFilters.Length}");
             using (_ = new Diagnosis("MeshPath"))
-                foreach (var mesh in meshes)
+                    foreach (var mr in meshFilters)
                 {
                     try
                     {
+                        var meshName = mr.mesh.name.Replace(" Instance", "");
+                        var objName = mr.name.Replace(":", "");
+                        var mesh = AssetManager.FindMesh(objName, meshName, scene.name);
+                        if (mesh == null) continue;
 
-                        var new_mesh = AssetManager.Get<Mesh>(mesh.name);
-                        if (new_mesh == null || mesh == null)
-                            continue;
-
-                        string name = $"Patched {mesh.name}";
-                        mesh.Clear();
-                        new_mesh.CopyTo(mesh);
-                        mesh.name = name;
-
-                        Logger.Info($"Patched mesh: {name}, vertices:{mesh.vertices.Length} triangles:{mesh.triangles.Length}");
+                        Logger.Debug($"Patching {mr.name}");
+                        mr.name = $"Patched {mr.name}";
+                        mr.mesh = mesh;
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"Failed to patch mesh: {mesh.name}", ex);
+                        Logger.Error($"Failed to patch mesh: {mr.name},{mr.mesh.name},{scene.name}", ex);
                     }
                 }
         }
@@ -173,8 +190,9 @@ namespace Entrypoint
                 newValue2 = "";
             }
 
-            __result = originalText.Replace("\\n", "\n").Replace("%!N!%", sequelCountConfigurable.
-                GetIntValue().ToString()).Replace("%!P!%", newValue).Replace(" %!S!%", newValue2);
+            originalText = originalText.Replace("The Stanley Parable ", "史丹利的寓言");
+            __result = originalText.Replace("\\n", "\n").Replace("%!N!%", $"<b>{sequelCountConfigurable.GetIntValue()}</b>")
+                .Replace("%!P!%", newValue).Replace(" %!S!%", newValue2);
 
             Logger.Debug($"final result {__result}");
 
@@ -190,8 +208,8 @@ namespace Entrypoint
         public static void UpdateTextPostfix(ref TMP_Text ___text)
         {
             ___text.text = $"<size=200%>起源汉化组</size>\n" +
-                $"内部测试版: 1.0.0\n"+
-                $"游戏版本: " +  (Application.version ?? "未知");
+                $"内部测试版: 1.0.0\n" +
+                $"游戏版本: " + (Application.version ?? "未知");
         }
     }
 }
