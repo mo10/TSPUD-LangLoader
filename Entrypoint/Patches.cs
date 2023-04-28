@@ -5,6 +5,7 @@ using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 namespace Entrypoint
 {
@@ -44,8 +45,8 @@ namespace Entrypoint
             }
 
             SceneManager.sceneLoaded += OnSceneLoaded;
-            //Logger.Debug("Set overlay");
-            //InitOverlay(__instance.gameObject);
+            Logger.Debug("Load overlay");
+            InitOverlay(__instance.gameObject);
             HardcodedTextPatch.DoPatch(__instance.gameObject);
 
         }
@@ -66,7 +67,7 @@ namespace Entrypoint
             var textures = Resources.FindObjectsOfTypeAll<Texture2D>();
 
             Logger.Debug($"Scene loaded: {scene.name}");
-
+            return;
             using (_ = new Diagnosis("TexturePatch"))
                 foreach (var texture in textures)
                 {
@@ -78,8 +79,8 @@ namespace Entrypoint
 
                         if (texture.name == "cardboardbox" && scene.name != "Firewatch_UD_MASTER")
                             continue;
-
-                        texture.UpdateExternalTexture(new_texture.GetNativeTexturePtr());
+                        //texture.UpdateExternalTexture(new_texture.GetNativeTexturePtr());
+                        Graphics.CopyTexture(new_texture, texture);
                         texture.name = $"Patched {texture.name}";
                         Logger.Debug($"Patched texture: {texture.name}");
                     }
@@ -103,10 +104,10 @@ namespace Entrypoint
             //    }
             //}
 
-                var meshFilters = Resources.FindObjectsOfTypeAll<MeshFilter>();
+            var meshFilters = Resources.FindObjectsOfTypeAll<MeshFilter>();
             Logger.Debug($"Patch MeshFilters, count: {meshFilters.Length}");
             using (_ = new Diagnosis("MeshPath"))
-                    foreach (var mr in meshFilters)
+                foreach (var mr in meshFilters)
                 {
                     try
                     {
@@ -154,6 +155,10 @@ namespace Entrypoint
 
                     // Add custom fonts to game asset manager
                     asset.mSource.AddAsset(AssetManager.Get<Font>("SourceHanSans"));
+                    if(GameMaster.Instance.languageProfileData.profiles.Any(x => x.DescriptionIni2Loc.Contains("Chinese")))
+                    {
+                        // Use Chinese
+                    }
                     // Import translate
                     string text = AssetManager.Get<TextAsset>("translate").text;
                     if (!string.IsNullOrEmpty(text))
