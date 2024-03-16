@@ -1,11 +1,16 @@
-﻿using HarmonyLib;
-using I2.Loc;
+﻿using I2.Loc;
 using System;
 using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using HarmonyLib;
+using System.Runtime.CompilerServices;
+#if MELON
+using MelonLoader;
+using MelonLoader.Utils;
+#endif
 
 namespace Entrypoint
 {
@@ -16,8 +21,11 @@ namespace Entrypoint
             Logger.Debug("TSPUD-LangLoader started.");
             AssetManager.Init();
 
+#if MELON
+#else
             var harmony = new Harmony("com.sourcelocalizationteam.tspud");
             harmony.PatchAll();
+#endif
         }
     }
 
@@ -28,7 +36,7 @@ namespace Entrypoint
         [HarmonyPatch(typeof(GameMaster), "Awake")]
         public static void Awake(GameMaster __instance)
         {
-            Logger.Debug("Set font");
+            Logger.Debug("Loading font");
             try
             {
                 Font font = AssetManager.Get<Font>("SourceHanSans");
@@ -45,17 +53,21 @@ namespace Entrypoint
             }
 
             SceneManager.sceneLoaded += OnSceneLoaded;
-            Logger.Debug("Load overlay");
+            Logger.Debug("Loading overlay");
             InitOverlay(__instance.gameObject);
             HardcodedTextPatch.DoPatch(__instance.gameObject);
-
         }
+
         [HarmonyPrefix]
         [HarmonyPatch(typeof(GameMaster), "StartMovie")]
         public static void StartMovie(bool skip, MoviePlayer player, string cameraName, ref string moviePath, bool isFullscreenMovie)
         {
             var filename = Path.GetFileName(moviePath);
+#if MELON
+            var new_path = Path.Combine(MelonEnvironment.GameRootDirectory, "SourceLocalization", filename);
+#else
             var new_path = Path.Combine(Entrypoint.GameRootDirectory, "SourceLocalization", filename);
+#endif
             if (File.Exists(new_path))
             {
                 moviePath = new_path;
@@ -64,10 +76,10 @@ namespace Entrypoint
         }
         private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            var textures = Resources.FindObjectsOfTypeAll<Texture2D>();
-
             Logger.Debug($"Scene loaded: {scene.name}");
-            return;
+
+            var textures = Resources.FindObjectsOfTypeAll<Texture2D>();
+            Logger.Debug($"Patch Textures, count: {textures.Length}");
             using (_ = new Diagnosis("TexturePatch"))
                 foreach (var texture in textures)
                 {
@@ -86,23 +98,9 @@ namespace Entrypoint
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"Failed to patch texture: {texture.name}", ex);
+                        Logger.Error($"Failed to patch texture: {texture.name} scene: {scene.name}", ex);
                     }
                 }
-
-            //var cubemaps = Resources.FindObjectsOfTypeAll<Cubemap>();
-            //using (_ = new Diagnosis("CubemapPatch"))
-            //{
-            //    foreach(var cubemap in cubemaps)
-            //    {
-            //        var new_cubemap = AssetManager.Get<Cubemap>(cubemap.name);
-            //        if (new_cubemap == null)
-            //            continue;
-            //        cubemap.UpdateExternalTexture(new_cubemap.GetNativeTexturePtr());
-            //        cubemap.name = $"Patched {cubemap.name}";
-            //        Logger.Debug($"Patched cubemap: {cubemap.name}");
-            //    }
-            //}
 
             var meshFilters = Resources.FindObjectsOfTypeAll<MeshFilter>();
             Logger.Debug($"Patch MeshFilters, count: {meshFilters.Length}");
@@ -116,13 +114,34 @@ namespace Entrypoint
                         var mesh = AssetManager.FindMesh(objName, meshName, scene.name);
                         if (mesh == null) continue;
 
-                        Logger.Debug($"Patching {mr.name}");
+                        Logger.Debug($"Patching origin meshName:{meshName} origin objName:{objName} {mr.name}");
                         mr.name = $"Patched {mr.name}";
                         mr.mesh = mesh;
+                        mr.gameObject.AddComponent<MeshPatcher>();
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"Failed to patch mesh: {mr.name},{mr.mesh.name},{scene.name}", ex);
+                        Logger.Error($"Failed to patch mesh: {mr.name},{mr.mesh.name} scene: {scene.name}", ex);
+                    }
+                }
+
+            var reflectionProbes = Resources.FindObjectsOfTypeAll<ReflectionProbe>();
+            Logger.Debug($"Patch ReflectionProbes, count: {reflectionProbes.Length}");
+            using (_ = new Diagnosis("MeshPath"))
+                foreach (var rp in reflectionProbes)
+                {
+                    try
+                    {
+                        if (rp.mode != UnityEngine.Rendering.ReflectionProbeMode.Realtime)
+                            rp.mode = UnityEngine.Rendering.ReflectionProbeMode.Realtime;
+                        if (rp.refreshMode != UnityEngine.Rendering.ReflectionProbeRefreshMode.ViaScripting)
+                            rp.refreshMode = UnityEngine.Rendering.ReflectionProbeRefreshMode.ViaScripting;
+                        Logger.Debug($"Render ReflectionProbe: {rp.name}");
+                        rp.RenderProbe();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"Failed to patch reflectionProbe: {rp.name} scene: {scene.name}", ex);
                     }
                 }
         }
@@ -213,7 +232,7 @@ namespace Entrypoint
         public static void UpdateTextPostfix(ref TMP_Text ___text)
         {
             ___text.text = $"<size=200%>起源汉化组</size>\n" +
-                $"内部测试版: 1.0.0\n" +
+                $"汉化版本: 2.0.0\n" +
                 $"游戏版本: " + (Application.version ?? "未知");
         }
     }

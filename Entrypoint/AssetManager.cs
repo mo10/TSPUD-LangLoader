@@ -73,7 +73,7 @@ namespace Entrypoint
 
             using (_ = new Diagnosis("AssetBundle.LoadFromStream"))
             {
-                assetStream = Utils.GetResource("Resources/sourcelocalizationteam");
+                assetStream = Utils.GetResource("Resources/sourcelocalization");
                 assetBundle = AssetBundle.LoadFromStream(assetStream);
             }
             if (assetBundle == null)
@@ -103,11 +103,21 @@ namespace Entrypoint
 
         public static Mesh FindMesh(string objName, string meshName, string sceneName)
         {
-            if (!meshIndex.ContainsKey(objName)) return null;
-            foreach(var info in meshIndex[objName])
+            if (meshIndex.ContainsKey(meshName))
             {
-                if ((info.meshName == "" || meshName == info.meshName) &&
-                    (info.sceneName == "" || sceneName == info.sceneName)) return info.mesh;
+                foreach (var info in meshIndex[meshName])
+                {
+                    if ((info.meshName == "" || meshName == info.meshName) &&
+                        (info.sceneName == "" || sceneName == info.sceneName)) return info.mesh;
+                }
+            }
+            if (meshIndex.ContainsKey(objName))
+            {
+                foreach (var info in meshIndex[objName])
+                {
+                    if ((info.meshName == "" || meshName == info.meshName) &&
+                        (info.sceneName == "" || sceneName == info.sceneName)) return info.mesh;
+                }
             }
 
             return null;

@@ -1,93 +1,75 @@
-﻿using MelonLoader;
-using Steamworks;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TSPUD_LangLoader
+namespace Entrypoint
 {
     class SourceTeamOverlay : MonoBehaviour
     {
-        public Text textTL;
-        public Text textTC;
-        public Text textTR;
-        public Text textBL;
-        public Text textBC;
-        public Text textBR;
-        private bool isInited=false;
-        private bool isSteamInited=false;
-        private static SourceTeamOverlay m_instance;
 
-        public static SourceTeamOverlay Instance
+        float zoom_step = 6f;
+        float zoom_stop = 0f;
+        bool zoom_down = false;
+        float default_mouse_sensX;
+        float default_mouse_sensY;
+
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoInlining)]
+        void Awake()
         {
-            get
-            {
-                if (m_instance == null)
-                {
-                    m_instance = new GameObject("SourceTeamOverlay").AddComponent<SourceTeamOverlay>();
-                    m_instance.gameObject.hideFlags = HideFlags.HideAndDontSave;
-                    DontDestroyOnLoad(m_instance.gameObject);
-                }
-                return m_instance;
-            }
-        }
-
-        public void setup()
-        {
-            if (isInited)
-                return;
-
-            isInited = true;
             var canvas = gameObject.AddComponent<Canvas>();
             var canvasScaler = gameObject.AddComponent<CanvasScaler>();
-            var graphicRaycaster = gameObject.AddComponent<GraphicRaycaster>();
-
             // Canvas
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-
-            textTL = CreateText(new Vector2(0, 1), new Vector2(0, 1), new Vector2(0, 1), TextAnchor.UpperLeft);
-            textTC = CreateText(new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0.5f, 1), TextAnchor.UpperCenter);
-            textTR = CreateText(new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1), TextAnchor.UpperRight);
-
-            textBL = CreateText(new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), TextAnchor.LowerLeft);
-            textBC = CreateText(new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(0.5f, 0), TextAnchor.LowerCenter);
-            textBR = CreateText(new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0), TextAnchor.LowerRight);
-
-            MelonLogger.Msg("Overlay loaded");
         }
-
-        [MethodImpl(MethodImplOptions.NoOptimization | MethodImplOptions.NoInlining)]
+        [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoInlining)]
         void Update()
         {
-            if (SteamManager.Initialized &&　!isSteamInited)
+            if (StanleyController.Instance == null)
+                return;
+
+            // 按Z缩放
+            if (Input.GetKeyDown(KeyCode.Z))
             {
-                isSteamInited = true;
-                textBC.text = SteamUser.GetSteamID().ToString();
+                zoom_down = true;
+                zoom_stop = StanleyController.Instance.FieldOfViewBase / 2f;
+                default_mouse_sensX = StanleyController.Instance.mouseSensitivityX;
+                default_mouse_sensY = StanleyController.Instance.mouseSensitivityY;
+                StanleyController.Instance.mouseSensitivityX = default_mouse_sensX * 0.5f;
+                StanleyController.Instance.mouseSensitivityY = default_mouse_sensY * 0.5f;
+                StanleyController.Instance.SetMovementSpeedMultiplier(0.5f);
             }
-        }
+            if (Input.GetKeyUp(KeyCode.Z))
+            {
+                zoom_down = false;
+                zoom_stop = StanleyController.Instance.FieldOfViewBase;
+                StanleyController.Instance.mouseSensitivityX = default_mouse_sensX;
+                StanleyController.Instance.mouseSensitivityY = default_mouse_sensY;
+                StanleyController.Instance.SetMovementSpeedMultiplier(1.0f);
+            }
 
-        Text CreateText(Vector2 pivot, Vector2 anchorMin, Vector2 anchorMax, TextAnchor textAnchor)
-        {
-            var textGameObject = new GameObject("Watermark");
-            DontDestroyOnLoad(textGameObject);
-            textGameObject.transform.parent = gameObject.transform;
-
-            var text = textGameObject.AddComponent<Text>();
-            text.font = AssetManager.Get<Font>("SourceHanSans");
-            text.color = new Color(1, 1, 1, 0.2f);
-            text.text = $"起源汉化组";
-            text.fontSize = 30;
-            text.alignment = textAnchor;
-
-            var rect = textGameObject.GetComponent<RectTransform>();
-            rect.localPosition = new Vector3(0, 0, 0);
-            rect.sizeDelta = new Vector2(350, 150);
-            rect.pivot = pivot;
-            rect.anchorMin = anchorMin;
-            rect.anchorMax = anchorMax;
-
-            return text;
+            if (zoom_down && StanleyController.Instance.FieldOfView >= zoom_stop)
+            {
+                StanleyController.Instance.FieldOfView -= zoom_step;
+            }
+            if (!zoom_down && StanleyController.Instance.FieldOfView < zoom_stop)
+            {
+                StanleyController.Instance.FieldOfView += zoom_step;
+            }
+#if DEBUG
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                StanleyController.Instance.SetMovementSpeedMultiplier(3.0f);
+            }
+            if (Input.GetKeyUp(KeyCode.LeftShift))
+            {
+                StanleyController.Instance.SetMovementSpeedMultiplier(1.0f);
+            }
+#endif
         }
     }
 }

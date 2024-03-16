@@ -2,12 +2,19 @@
 using System.Diagnostics;
 using System.IO;
 
+#if MELON
+using MelonLoader;
+#endif
+
 namespace Entrypoint
 {
     class Logger
     {
-
-#if DEBUG
+#if MELON
+        public static void Debug(object obj) => MelonLogger.Msg(obj);
+        public static void Error(object obj, Exception ex = null) => MelonLogger.Error($"{obj} ex:{ex}");
+        public static void Info(object obj) => MelonLogger.Msg(obj);
+#elif DEBUG
         private static StreamWriter fs = File.CreateText("sourceteam.log");
         private static object locker = new object();
 
